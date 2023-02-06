@@ -32,4 +32,9 @@ public class CustomerController {
         this.customerService.deleteCustomer(id);
         return  ResponseEntity.ok().build();
     }
+
+    @PatchMapping("{id}")
+    public Customer updateCustomer(@PathVariable("id") Integer id, @RequestBody CustomerDTO customerDTO) {
+        return this.customerService.updateCustomer(id, customerDTO);
+    }
 }

@@ -4,9 +4,13 @@ import com.wip.springexample.Repositories.CustomerRepository;
 import com.wip.springexample.dto.CustomerDTO;
 import com.wip.springexample.dto.mapper.MapDTOToCustomer;
 import com.wip.springexample.entities.Customer;
+import com.wip.springexample.exceptions.CustomerExceptions;
+import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerService {
@@ -29,5 +33,19 @@ public class CustomerService {
 
     public void deleteCustomer(Integer id){
         this.customerRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Customer updateCustomer(Integer id, CustomerDTO customerDTO) {
+        Optional<Customer> optCustomer = this.customerRepository.findById(id);
+        if (optCustomer.isEmpty()){
+            throw  new CustomerExceptions("Customer not found on system", HttpStatus.NOT_FOUND);
+        }
+        Customer customer = optCustomer.get();
+        customer.setAge(customerDTO.getAge());
+        customer.setName(customerDTO.getName());
+        customer.setEmail(customerDTO.getEmail());
+
+        return this.customerRepository.save(customer);
     }
 }
