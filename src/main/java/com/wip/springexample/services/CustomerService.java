@@ -22,7 +22,7 @@ public class CustomerService {
         this.mapper = mapper;
     }
 
-    public List<Customer> getAllCustomers(){
+    public List<Customer> getAllCustomers() {
         return this.customerRepository.findAll();
     }
 
@@ -31,20 +31,24 @@ public class CustomerService {
         this.customerRepository.save(customer);
     }
 
-    public void deleteCustomer(Integer id){
+    public void deleteCustomer(Integer id) {
+        Optional<Customer> optCustomer = this.customerRepository.findById(id);
+        if (optCustomer.isEmpty()) {
+            throw new CustomerExceptions("Customer not found on system", HttpStatus.NOT_FOUND);
+        }
         this.customerRepository.deleteById(id);
     }
 
     @Transactional
     public Customer updateCustomer(Integer id, CustomerDTO customerDTO) {
         Optional<Customer> optCustomer = this.customerRepository.findById(id);
-        if (optCustomer.isEmpty()){
-            throw  new CustomerExceptions("Customer not found on system", HttpStatus.NOT_FOUND);
+        if (optCustomer.isEmpty()) {
+            throw new CustomerExceptions("Customer not found on system", HttpStatus.NOT_FOUND);
         }
         Customer customer = optCustomer.get();
-        customer.setAge(customerDTO.getAge());
-        customer.setName(customerDTO.getName());
-        customer.setEmail(customerDTO.getEmail());
+        if(customerDTO.getAge() != 0) customer.setAge(customerDTO.getAge());
+        if(!customerDTO.getName().equals("")) customer.setName(customerDTO.getName());
+        if(!customerDTO.getEmail().equals("")) customer.setEmail(customerDTO.getEmail());
 
         return this.customerRepository.save(customer);
     }
